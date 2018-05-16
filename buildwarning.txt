@@ -1,0 +1,20 @@
+anaconda中的tiff库与/usr/lib/x86_64-linux-gnu中的相应库冲突。
+
+目前，用系统tiff库替换anaconda中的库。
+
+CMake警告：
+CMake Warning at CMakeLists.txt:61 (add_library):
+  Cannot generate a safe runtime search path for target ORB_SLAM2 because
+  files in some directories may conflict with libraries in implicit
+  directories:
+
+    runtime library [libfreetype.so.6] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /home/duan/anaconda3/lib
+    runtime library [libz.so.1] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /home/duan/anaconda3/lib
+    runtime library [libexpat.so.1] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /home/duan/anaconda3/lib
+    runtime library [libtiff.so.5] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /home/duan/anaconda3/lib
+    runtime library [libxml2.so.2] in /usr/lib/x86_64-linux-gnu may be hidden by files in:
+      /home/duan/anaconda3/lib
