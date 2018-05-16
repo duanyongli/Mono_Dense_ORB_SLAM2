@@ -60,7 +60,8 @@ Viewer.ViewpointF: 500
 #--------------------------------------------------------------------------------------------
 # DepthPrediction Parameters
 #--------------------------------------------------------------------------------------------
-DepthPrediction.modelpath: "/home/duan/SLAMProjects/Mono_Dense_ORB_SLAM2/tensorflow"
+DepthPrediction.modelpath: "/home/duan/SLAMProjects/Mono_Dense_ORB_SLAM2/DepthPrediction"
+DepthPrediction.inchannels: 3
 
 #--------------------------------------------------------------------------------------------
 # PointCloud Mapping

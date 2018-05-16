@@ -16,7 +16,7 @@ namespace ORB_SLAM2
     class DepthPrediction
     {
     public:
-        DepthPrediction(std::string modelpath);
+        DepthPrediction(std::string modelpath, int inchannels);
         int initPython();
 
         cv::Mat predictRGB(cv::Mat imgRGB);
@@ -26,15 +26,20 @@ namespace ORB_SLAM2
             //初始化 numpy 执行环境，主要是导入包
             import_array();
         }
+        int getInchannels();
 
         ~DepthPrediction();
     private:
+        int miInchannels;
+
         PyObject *mpModule;
         PyObject *mpDict;
-        PyObject *mpFunPredict;
+        PyObject *mpFunPredictRGB;
+        PyObject *mpFunPredictRGBD;
 
         std::string mstrmodelpath;
     };
 
+    inline int DepthPrediction::getInchannels() {return miInchannels;}
 }
 #endif //ORB_SLAM2_DEPTHPREDICTION_H

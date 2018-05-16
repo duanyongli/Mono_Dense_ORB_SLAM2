@@ -1,13 +1,13 @@
 //
 // Created by duan on 18-4-17.
 //
-
+#include <iostream>
 #include <DepthPrediction.h>
 
 namespace ORB_SLAM2
 {
-    DepthPrediction::DepthPrediction(std::string modelpath)
-    :mstrmodelpath(modelpath)
+    DepthPrediction::DepthPrediction(std::string modelpath, int inchannels)
+    :mstrmodelpath(modelpath), miInchannels(inchannels),mpFunPredictRGB(nullptr), mpFunPredictRGBD(nullptr)
     {}
 
     int DepthPrediction::initPython()
@@ -31,7 +31,20 @@ namespace ORB_SLAM2
             return -1;
         }
 
-        mpFunPredict = PyDict_GetItemString(mpDict, "predict");
+        PyObject *pArgs, *pValue;
+        pArgs = PyTuple_New(1);
+        assert(miInchannels==3 || miInchannels==4);
+        pValue = PyLong_FromLong(miInchannels);
+        PyTuple_SetItem(pArgs, 0, pValue);
+        PyObject *ploadmodel = PyDict_GetItemString(mpDict, "load_model");
+        PyObject_CallObject(ploadmodel, pArgs);
+        Py_DECREF(pValue);
+        Py_DECREF(pArgs);
+        Py_DECREF(ploadmodel);
+
+
+        mpFunPredictRGB = PyDict_GetItemString(mpDict, "predictRGB");
+        mpFunPredictRGBD = PyDict_GetItemString(mpDict, "predictRGBD");
 
         return 0;
     }
@@ -57,8 +70,9 @@ namespace ORB_SLAM2
         PyObject* PyArray = PyArray_SimpleNewFromData(2, Dims, NPY_UBYTE, data);
         PyObject* ArgArray = PyTuple_New(1);
         PyTuple_SetItem(ArgArray,0, PyArray);
-
-        PyArrayObject *pReturn = (PyArrayObject *)PyObject_CallObject(mpFunPredict, ArgArray);
+        std::cout<<"start PyObject_CallObject"<<std::endl;
+        PyArrayObject *pReturn = (PyArrayObject *)PyObject_CallObject(mpFunPredictRGB, ArgArray);
+        std::cout<<"end PyObject_CallObject"<<std::endl;
 
         cv::Mat depth(480, 640, CV_32FC1, cv::Scalar(0.));
         int Rows = pReturn->dimensions[0], columns = pReturn->dimensions[1];
@@ -80,7 +94,10 @@ namespace ORB_SLAM2
 
     DepthPrediction::~DepthPrediction()
     {
-        Py_DECREF(mpFunPredict);
+        if(mpFunPredictRGB)
+            Py_DECREF(mpFunPredictRGB);
+        if(mpFunPredictRGBD)
+            Py_DECREF(mpFunPredictRGBD);
         Py_DECREF(mpDict);
         Py_DECREF(mpModule);
 

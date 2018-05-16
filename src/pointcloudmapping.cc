@@ -130,8 +130,17 @@ void PointCloudMapping::viewer()
         for ( size_t i=lastKeyframeSize; i<N ; i++ )
         {
             //TODO:在此处使用深度预测
-            cv::Mat depthImg = mpDepthPrediction->predictRGB(colorImgs[i]);
-            depthImgs.push_back(depthImg);
+            cv::Mat depthImg;
+            if(mpDepthPrediction->getInchannels() == 3)
+            {
+                depthImg = mpDepthPrediction->predictRGB(colorImgs[i]);
+                depthImgs.push_back(depthImg);
+            }
+            else if(mpDepthPrediction->getInchannels() == 4)
+            {
+
+            }
+
 
             PointCloud::Ptr p = generatePointCloud( keyframes[i], colorImgs[i], depthImg );
             *globalMap += *p;
