@@ -3,7 +3,7 @@ tensorflow
 Vocabulary
 cmake-build*
 results
-KeyFrameTrajectory.txt
+Examples/Monocular/KeyFrameTrajectory.txt
 
 #PCL files
 *.pcd
