@@ -40,7 +40,7 @@ public:
     PointCloudMapping( double resolution_ , shared_ptr<DepthPrediction> pDepthPrediction);
     
     // 插入一个keyframe，会更新一次地图
-    void insertKeyFrame( KeyFrame* kf, cv::Mat& color, cv::Mat& depth );
+    //void insertKeyFrame( KeyFrame* kf, cv::Mat& color, cv::Mat& depth );
     void insertKeyFrame(KeyFrame* kf, cv::Mat& color);
     void shutdown();
     void viewer();

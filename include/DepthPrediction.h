@@ -17,7 +17,6 @@ namespace ORB_SLAM2
     {
     public:
         DepthPrediction(std::string modelpath, int inchannels);
-        int initPython();
 
         cv::Mat predictRGB(cv::Mat imgRGB);
         cv::Mat predictRGBD(cv::Mat imgRGB, cv::Mat sparseDepth);
@@ -30,6 +29,8 @@ namespace ORB_SLAM2
 
         ~DepthPrediction();
     private:
+        int initPython();
+
         int miInchannels;
 
         PyObject *mpModule;

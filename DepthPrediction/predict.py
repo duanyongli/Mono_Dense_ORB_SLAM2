@@ -49,14 +49,18 @@ def load_model(inchannels):
     model.eval()
     print("=> loaded checkpoint")
 store = []
+
 def predictRGB(imgarray):
     rgb_np = imageFromArray(imgarray)
     rgb_np = np.array(rgb_np).astype('float32') / 255
     rgb_tensor = torch.from_numpy(rgb_np.transpose((2, 0, 1)))
+
+    #!!!!!!不添加此句，C++程序返回失败。 初步判断为torch.Tensor释放导致。
+    store.append(rgb_tensor)
+
     input_tensor = rgb_tensor.to(device)
     # while input_tensor.dim() < 3:
     input_tensor = input_tensor.unsqueeze(0)
-    store.append(rgb_tensor)
     start_time = time.time()
     depth_pred = model(input_tensor)
     gpu_time = time.time() - start_time
@@ -68,22 +72,35 @@ def predictRGB(imgarray):
     depth_pred_np = np.squeeze(depth_pred_tensor).astype('float32')
     return depth_pred_np
 
-# def predictRGB(imgarray):
-#     global rgb_tensor
-#     rgb_np = imageFromArray(imgarray)
-#     rgb_np = np.array(rgb_np).astype('float32') / 255
-#     rgb_np_CHW = rgb_np.transpose((2, 0, 1))
-#     rgb_tensor = torch.Tensor(rgb_np_CHW)
-#     store.append(rgb_tensor)
-#
-#     a = np.random.uniform(0, 3, (480, 640))
-#     return a
+def predictRGBD(imgarray, sparsedepth):
+    rgb_np = imageFromArray(imgarray)
+    rgb_np = np.array(rgb_np).astype('float32') / 255
+    sparsedepth_np = sparsedepth.astype('float32')
+    np.expand_dims(sparsedepth_np, axis=2)
+    input_np = np.dstack((rgb_np, sparsedepth_np))
 
-def predcitRGBD(img, sparsedepth):
-    pass
+    input_tensor = torch.from_numpy(input_np.transpose((2, 0, 1)))
+
+    # !!!!!!不添加此句，C++程序返回失败。 初步判断为torch.Tensor释放导致。
+    store.append(input_tensor)
+
+    input_tensor = input_tensor.to(device)
+    # while input_tensor.dim() < 3:
+    input_tensor = input_tensor.unsqueeze(0)
+    start_time = time.time()
+    depth_pred = model(input_tensor)
+    gpu_time = time.time() - start_time
+    print('t_GPU={gpu_time:.3f}'.format(gpu_time=gpu_time))
+
+    # img_merge = utils.merge_into_row_with_gt(input_tensor[:, :3, :, :], input_tensor[:, 3, :, :], target, depth_pred)
+    # utils.save_image(img_merge, "pics.png")
+    depth_pred_tensor = depth_pred.cpu().detach().numpy()
+    depth_pred_np = np.squeeze(depth_pred_tensor).astype('float32')
+    return depth_pred_np
 
 if __name__=='__main__':
-    load_model(3)
+    load_model(4)
     input = np.random.uniform(0,256,(480, 1920)).astype(np.int)
-    output = predictRGB(input)
+    depth = np.random.uniform(0,3,(480, 640)).astype(np.float32)
+    output = predictRGBD(input, depth)
     print(output.shape)

@@ -88,7 +88,6 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     int inchannels = fsSettings["DepthPrediction.inchannels"];
     assert(inchannels==3 || inchannels==4);
     mpDepthPrediction = make_shared<DepthPrediction>(modelpath, inchannels);
-    mpDepthPrediction->initPython();
     mpPointCloudMapping = make_shared<PointCloudMapping>( resolution, mpDepthPrediction);
     mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, mpMapDrawer,
                              mpMap, mpPointCloudMapping, mpKeyFrameDatabase, strSettingsFile, mSensor);

@@ -103,14 +103,6 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
     cout << "- fps: " << fps << endl;
 
 
-    int nRGB = fSettings["Camera.RGB"];
-    mbRGB = nRGB;
-
-    if(mbRGB)
-        cout << "- color order: RGB (ignored if grayscale)" << endl;
-    else
-        cout << "- color order: BGR (ignored if grayscale)" << endl;
-
     // Load ORB parameters
 
     int nFeatures = fSettings["ORBextractor.nFeatures"];
@@ -174,29 +166,15 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
 
     if(mImGray.channels()==3)
     {
-        if(mbRGB)
-        {
-            cvtColor(mImGray,mImGray,CV_RGB2GRAY);
-            cvtColor(imGrayRight,imGrayRight,CV_RGB2GRAY);
-        }
-        else
-        {
-            cvtColor(mImGray,mImGray,CV_BGR2GRAY);
-            cvtColor(imGrayRight,imGrayRight,CV_BGR2GRAY);
-        }
+        cvtColor(mImGray, mImGray, CV_RGB2GRAY);
+        cvtColor(imGrayRight, imGrayRight, CV_RGB2GRAY);
+
     }
     else if(mImGray.channels()==4)
     {
-        if(mbRGB)
-        {
-            cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
-            cvtColor(imGrayRight,imGrayRight,CV_RGBA2GRAY);
-        }
-        else
-        {
-            cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
-            cvtColor(imGrayRight,imGrayRight,CV_BGRA2GRAY);
-        }
+         cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
+         cvtColor(imGrayRight,imGrayRight,CV_RGBA2GRAY);
+
     }
 
     mCurrentFrame = Frame(mImGray,imGrayRight,timestamp,mpORBextractorLeft,mpORBextractorRight,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
@@ -215,17 +193,11 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
 
     if(mImGray.channels()==3)
     {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGB2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGR2GRAY);
+        cvtColor(mImGray,mImGray,CV_RGB2GRAY);
     }
     else if(mImGray.channels()==4)
     {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
+        cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
     }
 
     if(mDepthMapFactor!=1 || mImDepth.type()!=CV_32F)
@@ -248,17 +220,11 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &imRGB, const double &timesta
 
     if(mImGray.channels()==3)
     {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGB2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGR2GRAY);
+        cvtColor(mImGray,mImGray,CV_RGB2GRAY);
     }
     else if(mImGray.channels()==4)
     {
-        if(mbRGB)
-            cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
-        else
-            cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
+        cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
     }
 
     if(mState==NOT_INITIALIZED || mState==NO_IMAGES_YET)
@@ -1158,10 +1124,7 @@ void Tracking::CreateNewKeyFrame()
 
     mpLocalMapper->SetNotStop(false);
 
-    if(mSensor == System::MONOCULAR)
-        mpPointCloudMapping->insertKeyFrame( pKF, this->mImRGB);
-    else
-        mpPointCloudMapping->insertKeyFrame( pKF, this->mImRGB, this->mImDepth );
+    mpPointCloudMapping->insertKeyFrame( pKF, this->mImRGB);
 
     mnLastKeyFrameId = mCurrentFrame.mnId;
     mpLastKeyFrame = pKF;

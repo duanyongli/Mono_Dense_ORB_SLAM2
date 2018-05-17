@@ -48,16 +48,16 @@ void PointCloudMapping::shutdown()
     viewerThread->join();
 }
 
-void PointCloudMapping::insertKeyFrame(KeyFrame* kf, cv::Mat& color, cv::Mat& depth)
-{
-    cout<<"receive a keyframe, id = "<<kf->mnId<<endl;
-    unique_lock<mutex> lck(keyframeMutex);
-    keyframes.push_back( kf );
-    colorImgs.push_back( color.clone() );
-    depthImgs.push_back( depth.clone() );
-
-    keyFrameUpdated.notify_one();
-}
+//void PointCloudMapping::insertKeyFrame(KeyFrame* kf, cv::Mat& color, cv::Mat& depth)
+//{
+//    cout<<"receive a keyframe, id = "<<kf->mnId<<endl;
+//    unique_lock<mutex> lck(keyframeMutex);
+//    keyframes.push_back( kf );
+//    colorImgs.push_back( color.clone() );
+//    depthImgs.push_back( depth.clone() );
+//
+//    keyFrameUpdated.notify_one();
+//}
 
 void PointCloudMapping::insertKeyFrame(KeyFrame *kf, cv::Mat &color)
 {
@@ -138,7 +138,28 @@ void PointCloudMapping::viewer()
             }
             else if(mpDepthPrediction->getInchannels() == 4)
             {
+                int rows = colorImgs[i].rows;
+                int cols = colorImgs[i].cols;
 
+                cv::Mat sparseDepth = cv::Mat::zeros(rows, cols, CV_32F);
+                KeyFrame* keyframe = keyframes[i];
+                set<MapPoint*> pMapPoints = keyframe->GetMapPoints();
+                for(auto begin=pMapPoints.begin(), end=pMapPoints.end(); begin!=end; ++begin)
+                {
+                    cv::Mat worldPos = (*begin)->GetWorldPos();
+                    cv::Mat cameraPos = keyframe->GetRotation()*worldPos + keyframe->GetTranslation();
+                    float depth = cameraPos.at<float>(2);
+                    cv::Mat nomarlizeCameraPos = cameraPos/depth;
+                    cv::Mat pixelPos = keyframe->mK*nomarlizeCameraPos;
+                    int u = round(pixelPos.at<float>(0));
+                    int v = round(pixelPos.at<float>(1));
+                    if(u>=0 && u<cols && v>=0 &&v<rows)
+                    {
+                        sparseDepth.at<float>(v, u) = depth;
+                    }
+                }
+                depthImg = mpDepthPrediction->predictRGBD(colorImgs[i], sparseDepth);
+                depthImgs.push_back(depthImg);
             }
 
 
