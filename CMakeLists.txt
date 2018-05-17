@@ -7,7 +7,8 @@ ENDIF()
 
 MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 
-set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS} -Wall   -O3 -march=native")
+#Release 优化必须设置为O0即无优化，否则会有segment error.原因未知
+set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS} -Wall -O0 -march=native")
 set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS} -Wall -g -ggdb -march=native")
 
 add_compile_options("-Wno-deprecated-declarations")
