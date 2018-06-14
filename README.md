@@ -1,4 +1,5 @@
-# RGBD_ORB_SLAM2_RT
+# The results is in *.png
+# Install RGBD_ORB_SLAM2_RT
 Real-time envrionment reconstruction based on ORB_SLAM2 with XTION (RGBD sensor) <br>
  
 ### Introduction
